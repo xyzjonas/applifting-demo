@@ -1,5 +1,5 @@
 import posixpath
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import aiohttp
 from loguru import logger
@@ -78,7 +78,7 @@ class TokenManager:
             else:
                 return True
 
-        delta = (datetime.utcnow() - self._token.updated_at)
+        delta = (datetime.utcnow() - self._token.updated_at.replace(tzinfo=None))
         if expired := delta > timedelta(seconds=configuration.connector.token_validity_secs):
             logger.info(f"Token from {self._token.updated_at!r} is now expired...")
         return expired
