@@ -2,24 +2,41 @@ version: '3'
 services:
 
   aggregator:
-    depends_on:
-      - db
     build:
       dockerfile: Dockerfile
+    restart: always
     environment:
-      DATABASE_URI: postgresql://applifting:postgres@db/applifting
+      - DATABASE_URI=postgresql://applifting:applifting@postgres/applifting
+      - CLOUD_URI=https://python.exercise.applifting.cz/
+      - ACCESS_TOKEN
     entrypoint: applifting-demo
     ports:
       - "80:8000"
+    depends_on:
+      - postgres
     networks:
       - internal
 
-  db:
+  watcher:
+    build:
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      - DATABASE_URI=postgresql://applifting:applifting@postgres/applifting
+      - CLOUD_URI=https://python.exercise.applifting.cz/
+      - ACCESS_TOKEN
+    entrypoint: remote-mock
+    depends_on:
+      - postgres
+    networks:
+      - internal
+
+  postgres:
     image: postgres
     restart: always
     environment:
-      POSTGRES_USER: applifting
-      POSTGRES_PASSWORD: postgres
+      - POSTGRES_USER=applifting
+      - POSTGRES_PASSWORD=applifting
     networks:
       - internal
 
@@ -27,7 +44,7 @@ services:
     image: adminer
     restart: always
     ports:
-      - 8080:8080
+      - "8080:8080"
     networks:
       - internal
 

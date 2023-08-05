@@ -10,6 +10,7 @@ class RemoteConfiguraton(BaseSettings):
     access_token: str | None = None
     # cloud_uri: str = "https://python.exercise.applifting.cz/"
     cloud_uri: str = "http://localhost:9000/"
+    # todo: parse JWT and extract validity from there...
     token_validity_secs: int = 5 * 60
 
 

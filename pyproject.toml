@@ -8,6 +8,7 @@ readme = "README.md"
 packages = [
     { include = "aggregator_api", from = "src/python" },
     { include = "aggregator_connector", from = "src/python" },
+    { include = "aggregator_watcher", from = "src/python" },
     { include = "aggregator_common", from = "src/python" },
     { include = "aggregator_mock", from = "src/python" }
 ]

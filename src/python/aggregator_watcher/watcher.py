@@ -107,7 +107,7 @@ class Watcher:
         while True:
             try:
                 await self.refresh()
-            except Exception as exc_info:
+            except Exception:
                 logger.exception("Error while looping...")
                 await asyncio.sleep(5)
             else:
