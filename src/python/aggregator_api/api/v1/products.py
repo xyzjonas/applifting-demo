@@ -4,11 +4,12 @@ from fastapi import APIRouter
 from fastapi_pagination import Page, add_pagination
 from starlette.responses import Response
 
-from aggregator_api.api.v1.common.dependencies import ProductsDependency
+from aggregator_api.api.v1.common.dependencies import ProductsDependency, OffersDependency
 from aggregator_api.api.v1.common.schemas import ProductCreate, ProductUpdate
-from aggregator_common.schemas import Product
+from aggregator_common.schemas import Product, Offer
 
-router = APIRouter()
+
+router = APIRouter(tags=['Products'])
 
 
 @router.get('')
@@ -21,6 +22,11 @@ async def get_product(products: ProductsDependency, product_id: UUID) -> Product
     return await products.get_by_id(product_id)
 
 
+@router.get('/{product_id}/offers')
+async def get_product_offers(offers: OffersDependency, product_id: UUID) -> Page[Offer]:
+    return await offers.get_by_product(product_id=product_id, use_paginate=True)
+
+
 @router.post('')
 async def create_product(
         response: Response, products: ProductsDependency, product_data: ProductCreate
@@ -31,7 +37,7 @@ async def create_product(
 
 
 @router.put('/{product_id}')
-async def create_product(
+async def update_product(
         products: ProductsDependency,
         product_data: ProductUpdate,
         product_id: UUID,

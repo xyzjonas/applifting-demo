@@ -1,8 +1,10 @@
 import uuid
 from datetime import datetime
+from typing import List
 
-from sqlalchemy import String, Integer, create_engine, Date, DateTime, func
-from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, Session
+from sqlalchemy import String, Integer, create_engine, Date, DateTime, func, Table, Column, \
+    ForeignKey
+from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, Session, relationship
 
 from aggregator_common.configuration import get_configuration
 
@@ -34,6 +36,8 @@ class Product(Base):
     name: Mapped[str] = mapped_column(String)
     description: Mapped[str] = mapped_column(String)
 
+    offers: Mapped[List['Offer']] = relationship(back_populates="product")
+
 
 class Offer(Base):
     """Offer db ORM."""
@@ -42,6 +46,9 @@ class Offer(Base):
     id: Mapped[str] = mapped_column(unique=True, default=uuid_factory)
     price: Mapped[int] = mapped_column(Integer)
     items_in_stock: Mapped[int] = mapped_column(Integer)
+
+    product_id: Mapped[str] = mapped_column(ForeignKey("products.id"))
+    product: Mapped[Product] = relationship(back_populates="offers")
 
 
 class Token(Base):

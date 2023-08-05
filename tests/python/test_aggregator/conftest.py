@@ -12,7 +12,7 @@ from aggregator_common.models import create_all, drop_all
 @pytest.fixture(scope='function')
 def random_str():
     def _inner(size=12):
-        return ''.join([random.choice(string.ascii_lowercase) for _ in range(size)])
+        return ''.join([random.choice(string.ascii_lowercase + ' ') for _ in range(size)])
     return _inner
 
 

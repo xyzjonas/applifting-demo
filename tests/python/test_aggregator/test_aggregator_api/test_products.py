@@ -22,17 +22,6 @@ def products(request, db_session):
     return request.param
 
 
-@pytest.fixture(scope='function')
-def product(db_session, random_str):
-    product = Product(
-        name=f"Product {random_str()}",
-        description=random_str()
-    )
-    db_session.add(product)
-    db_session.commit()
-    return product
-
-
 def test_get_products(test_client, base_route, products):
     response = test_client.get(os.path.join(base_route, 'products'))
     response.raise_for_status()

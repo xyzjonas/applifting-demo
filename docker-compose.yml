@@ -1,0 +1,36 @@
+version: '3'
+services:
+
+  aggregator:
+    depends_on:
+      - db
+    build:
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URI: postgresql://applifting:postgres@db/applifting
+    entrypoint: applifting-demo
+    ports:
+      - "80:8000"
+    networks:
+      - internal
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: applifting
+      POSTGRES_PASSWORD: postgres
+    networks:
+      - internal
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge

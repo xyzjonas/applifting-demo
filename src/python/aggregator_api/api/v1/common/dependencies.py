@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
-from aggregator_api.api.v1.common.controllers import ProductsController
+from aggregator_api.api.v1.common.controllers import ProductsController, OffersController
 from aggregator_common.models import engine
 from aggregator_connector.client import AggregatorClient
 
@@ -26,6 +26,14 @@ async def products(db: DbSessionDependency) -> ProductsController:
 
 
 ProductsDependency = Annotated[ProductsController, Depends(products)]
+
+
+async def offers(db: DbSessionDependency) -> OffersController:
+    """Get the export tool."""
+    return OffersController(db)
+
+
+OffersDependency = Annotated[OffersController, Depends(offers)]
 
 
 async def client(db: DbSessionDependency) -> AggregatorClient:

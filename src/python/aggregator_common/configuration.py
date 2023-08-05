@@ -25,7 +25,7 @@ class DefaultConfiguration(BaseSettings):
 
 
 class DevelConfiguration(DefaultConfiguration):
-    database_uri: str = f"sqlite:////tmp/app-db-{now}.sqlite"
+    database_uri: str = f"sqlite:////tmp/test-applifting-db.sqlite"
     debug_mode: bool = True
 
 

@@ -24,8 +24,7 @@ async def test_register_product(mocked_refresh, db_session, random_str):
     mocked_resp = MockResponse({'id': product_id}, 201)
     with mock.patch(
             "aggregator_connector.client.aiohttp.ClientSession.post", return_value=mocked_resp
-    ) as mocked_resp:
+    ):
         client = AggregatorClient()
         response = await client.register_product(**request_data)
-        h = mocked_resp.response_data
         assert response == {'id': product_id}

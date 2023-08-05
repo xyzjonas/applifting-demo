@@ -90,3 +90,28 @@ class ProductsController(
 ):
     """Simple controller for products CRUD"""
 
+
+class OffersController(
+    SimpleController[
+        None,
+        models.Offer,
+        None
+    ]
+):
+    """Simple controller for products CRUD"""
+
+    async def create(self, data: C) -> M:
+        raise AggregatorError('CREATE not allowed')
+
+    async def update(self, item_id: UUID, data: U) -> M:
+        raise AggregatorError('UPDATE not allowed')
+
+    async def get_by_product(self, product_id: UUID, use_paginate: bool = False) -> list[M] | Page[M]:
+        """Get all offers belonging to a particular product."""
+        if use_paginate:
+            items = paginate(self.db_session, select(self.model).filter_by(product_id=str(product_id)))
+        else:
+            items = self.db_session.query(self.model).filter_by(product_id=product_id).all()
+        return items
+
+

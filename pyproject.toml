@@ -12,7 +12,7 @@ packages = [
 ]
 
 [tool.poetry.scripts]
-aggregator = "aggregator_api.main:serve"
+applifting-demo = "aggregator_api.main:serve"
 
 [tool.poetry.dependencies]
 python = "^3.10"
