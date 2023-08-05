@@ -2,13 +2,13 @@ import posixpath
 from datetime import datetime, timedelta
 
 import aiohttp
-from sqlalchemy.orm import Session
 from loguru import logger
+from sqlalchemy.orm import Session
 
-from aggregator_common.models import engine
-from aggregator_common.models import Token as TokenDb
 from aggregator_common import configuration
 from aggregator_common.exceptions import TokenError
+from aggregator_common.models import Token as TokenDb
+from aggregator_common.models import engine
 from aggregator_common.schemas import Token
 
 

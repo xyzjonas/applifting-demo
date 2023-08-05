@@ -2,8 +2,8 @@ import asyncio
 
 from loguru import logger
 
-from aggregator_common.models import create_all
 from aggregator_common import configuration
+from aggregator_common.models import create_all
 from aggregator_watcher.watcher import Watcher
 
 

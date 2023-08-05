@@ -2,7 +2,6 @@ import json
 
 from aiohttp import ClientResponseError
 from httpx import Response
-from mock import AsyncMock
 from mock.mock import MagicMock
 
 

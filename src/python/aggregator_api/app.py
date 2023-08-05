@@ -1,5 +1,5 @@
-from loguru import logger
 from fastapi import FastAPI
+from loguru import logger
 from starlette.middleware.cors import CORSMiddleware
 
 from aggregator_api.api import router

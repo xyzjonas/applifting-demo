@@ -8,8 +8,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from aggregator_api.api.v1.common import schemas
-from aggregator_common.exceptions import NotFound, AggregatorError
 from aggregator_common import models
+from aggregator_common.exceptions import NotFound, AggregatorError
 
 C = TypeVar('C', bound=schemas.Base)
 M = TypeVar('M', bound=models.Base)
@@ -35,15 +35,18 @@ class SimpleController(Generic[C, M, U]):
     def update_schema(self) -> Type[U]:
         return typing.get_args(self.__orig_bases__[0])[2]
 
-    async def create(self, data: C) -> M:
+    async def create(self, data: C, own_id: UUID = None) -> M:
         """Generic create method."""
         new_model = self.model(**data.model_dump())
+        if own_id:
+            setattr(new_model, 'id', str(own_id))
         try:
             self.db_session.add(new_model)
             self.db_session.commit()
         except Exception as exc_info:
+
             raise AggregatorError(
-                f"Failed to create a new {self.model.__name__!r}, {data.model_dump()}"
+                f"Failed to create a new {self.model.__name__!r}, {exc_info}\n\n{data.model_dump()}"
             ) from exc_info
         return new_model
 
@@ -72,7 +75,7 @@ class SimpleController(Generic[C, M, U]):
             self.db_session.commit()
         except Exception as exc_info:
             raise AggregatorError(
-                f"Failed to update {self.model.__name__!r}, {data.model_dump()}"
+                f"Failed to update {self.model.__name__!r}, {exc_info}\n\n{data.model_dump()}"
             ) from exc_info
         return updated_item
 
@@ -89,6 +92,7 @@ class ProductsController(
     ]
 ):
     """Simple controller for products CRUD"""
+    pass
 
 
 class OffersController(
@@ -100,7 +104,7 @@ class OffersController(
 ):
     """Simple controller for products CRUD"""
 
-    async def create(self, data: C) -> M:
+    async def create(self, data: C, own_id: UUID = None) -> M:
         raise AggregatorError('CREATE not allowed')
 
     async def update(self, item_id: UUID, data: U) -> M:

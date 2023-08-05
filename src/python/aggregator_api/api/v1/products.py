@@ -1,13 +1,14 @@
+import uuid
 from uuid import UUID
 
 from fastapi import APIRouter
 from fastapi_pagination import Page, add_pagination
 from starlette.responses import Response
 
-from aggregator_api.api.v1.common.dependencies import ProductsDependency, OffersDependency
+from aggregator_api.api.v1.common.dependencies import ProductsDependency, OffersDependency, \
+    RemoteClientDependency
 from aggregator_api.api.v1.common.schemas import ProductCreate, ProductUpdate
 from aggregator_common.schemas import Product, Offer
-
 
 router = APIRouter(tags=['Products'])
 
@@ -29,9 +30,17 @@ async def get_product_offers(offers: OffersDependency, product_id: UUID) -> Page
 
 @router.post('')
 async def create_product(
-        response: Response, products: ProductsDependency, product_data: ProductCreate
+        response: Response,
+        products: ProductsDependency,
+        client: RemoteClientDependency,
+        product_data: ProductCreate,
 ) -> Product:
-    product = await products.create(product_data)
+    product_id = uuid.uuid4()
+    await client.register_product(
+        Product(id=product_id, **product_data.model_dump())
+    )
+
+    product = await products.create(product_data, own_id=product_id)
     response.status_code = 201
     return product
 

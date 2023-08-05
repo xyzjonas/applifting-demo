@@ -1,18 +1,17 @@
 import asyncio
 import uuid
-from datetime import timedelta
 from uuid import UUID
 
 from loguru import logger
 from sqlalchemy import update, delete, select, column, insert
 from sqlalchemy.orm import Session
 
-from aggregator_common.models import engine
-from aggregator_common.models import Product as ProductDb
+from aggregator_common import configuration
 from aggregator_common.models import Offer as OfferDb
+from aggregator_common.models import Product as ProductDb
+from aggregator_common.models import engine
 from aggregator_common.schemas import Offer
 from aggregator_connector.client import RemoteClient
-from aggregator_common import configuration
 
 
 class Watcher:

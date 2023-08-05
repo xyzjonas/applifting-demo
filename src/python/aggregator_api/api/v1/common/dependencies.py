@@ -36,10 +36,10 @@ async def offers(db: DbSessionDependency) -> OffersController:
 OffersDependency = Annotated[OffersController, Depends(offers)]
 
 
-async def client(db: DbSessionDependency) -> RemoteClient:
+async def client() -> RemoteClient:
     """Get the export tool."""
     return RemoteClient()
 
 
-AggregatorClientDependency = Annotated[RemoteClient, Depends(client)]
+RemoteClientDependency = Annotated[RemoteClient, Depends(client)]
 

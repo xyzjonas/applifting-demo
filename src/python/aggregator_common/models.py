@@ -35,7 +35,7 @@ class Product(Base):
     name: Mapped[str] = mapped_column(String)
     description: Mapped[str] = mapped_column(String)
 
-    offers: Mapped[List['Offer']] = relationship(back_populates="product")
+    offers: Mapped[List['Offer']] = relationship(back_populates="product", cascade="all,delete")
 
 
 class Offer(Base):

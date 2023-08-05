@@ -1,5 +1,5 @@
-import string
 import random
+import string
 
 import pytest
 from sqlalchemy import create_engine

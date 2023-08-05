@@ -29,6 +29,7 @@ async def test_register_product(mocked_refresh, db_session, random_str):
         response = await client.register_product(product_to_be_registred)
         assert response == product_to_be_registred
 
+
 @pytest.fixture
 def xxxx():
     create_all()

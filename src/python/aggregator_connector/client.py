@@ -5,7 +5,6 @@ import aiohttp
 from aiohttp import ClientResponseError
 from loguru import logger
 from pydantic import ValidationError, BaseModel
-from sqlalchemy.orm import Session
 
 from aggregator_common import configuration
 from aggregator_common.exceptions import AggregatorError, RemoteConnectionError
@@ -34,22 +33,22 @@ class RemoteClient:
             try:
                 return await coro(*args, **kwargs)
             except ClientResponseError as exc_info:
-                if exc_info.status >= 500:
+                if exc_info.status >= 400:
                     nonlocal retries
                     if retries <= max_retries:
-                        logger.info(f"Got {exc_info.status}, retrying {retries}/{max_retries}")
+                        logger.warning(f"Got {exc_info.status}, retrying {retries}/{max_retries}")
                         retries += 1
                         return await inner(*args, **kwargs)
-                raise AggregatorError(
-                    f"Aggregator connector request failed with: {exc_info.status}", exc_info
+                raise RemoteConnectionError(
+                    f"Aggregator connector request failed with: {exc_info.status}"
                 ) from exc_info
             except ValidationError as exc_info:
-                raise AggregatorError(
+                raise RemoteConnectionError(
                     f"Unexpected response from remote service", exc_info
                 ) from exc_info
             except Exception as exc_info:
                 logger.exception("Unexpected error while executing API request.")
-                raise AggregatorError(str(exc_info)) from exc_info
+                raise RemoteConnectionError(str(exc_info)) from exc_info
 
         return inner
 
@@ -63,21 +62,17 @@ class RemoteClient:
                     headers={
                       'Bearer': (await self.token_manager.get_token()).value
                     },
-                    data={
-                        'id': product.id,
-                        'name': product.name,
-                        'description': product.description,
-                    },
+                    json=product.model_dump(),
             ) as response:
                 response.raise_for_status()
-
-        response = RegisterProductResponse(**await response.json())
+                response = RegisterProductResponse(**await response.json())
         if response.id != product.id:
             msg = f"Unexpected response from remote service: {response.id} != {product.id}"
             logger.error(msg)
             raise AggregatorError(msg)
         return product
 
+    @wrap_request
     async def get_offers(self, product_id: UUID) -> list[Offer]:
         async with aiohttp.ClientSession() as session:
             url = posixpath.join(self.base_uri, str(product_id), "offers")

@@ -9,8 +9,10 @@ from starlette.responses import Response
 
 from aggregator_common.schemas import Product, Offer
 
-
 app = FastAPI()
+
+
+registered_products = {}
 
 
 class RegisterProductResponse(BaseModel):
@@ -34,15 +36,30 @@ def auth(response: Response) -> TokenResposne:
 
 @app.post("/api/v1/products/register")
 def register_product(product: Product, response: Response) -> RegisterProductResponse:
+    registered_products[product.id] = []
     response.status_code = 201
     return RegisterProductResponse(id=product.id)
 
 
 @app.get("/api/v1/products/{product_id}/offers")
-def get_offers() -> list[Offer]:
-    offer.price = random.randint(1, 1000)
-    offer.items_in_stock = random.randint(1, 30)
-    offers = [offer]
+def get_offers(product_id: UUID, response: Response) -> list[Offer]:
+    if product_id not in registered_products:
+        response.status_code = 404
+        return []
+
+    if not registered_products.get(product_id):
+        ofrs = []
+        for index in range(random.randint(1, 3)):
+            ofrs.append(
+                Offer(
+                    id=uuid.uuid4(),
+                    price=random.randint(1, 1000),
+                    items_in_stock=random.randint(1, 30)
+                )
+            )
+        registered_products[product_id] = ofrs
+
+    offers = list(registered_products[product_id])
     for index in range(random.randint(0, 20)):
         offers.append(
             Offer(

@@ -1,11 +1,18 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer
 
 
-class Offer(BaseModel):
+class BaseUuid(BaseModel):
     id: UUID
+
+    @field_serializer('id')
+    def serialize_uuid(self, id_: UUID, _info):
+        return str(id_)
+
+
+class Offer(BaseUuid):
     price: int
     items_in_stock: int
 
@@ -13,8 +20,7 @@ class Offer(BaseModel):
         orm_mode = True
 
 
-class Product(BaseModel):
-    id: UUID
+class Product(BaseUuid):
     name: str
     description: str
 
