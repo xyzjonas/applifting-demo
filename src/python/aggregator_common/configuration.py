@@ -1,45 +1,31 @@
-import os
-from functools import lru_cache
-
-from pydantic import validator, field_validator
 from pydantic_settings import BaseSettings
 
-from datetime import datetime
 
-
-now = datetime.now().timestamp()
-
-
-class DefaultConfiguration(BaseSettings):
-    database_uri: str
+class DatabaseConfiguration(BaseSettings):
+    database_uri: str = f"sqlite:////tmp/applifting-tmp-db.sqlite"
     debug_mode: bool = False
 
+
+class RemoteConfiguraton(BaseSettings):
     access_token: str | None = None
-    cloud_uri: str = "https://python.exercise.applifting.cz/"
+    # cloud_uri: str = "https://python.exercise.applifting.cz/"
+    cloud_uri: str = "http://localhost:9000/"
     token_validity_secs: int = 5 * 60
 
-    uvicorn_host: str = "0.0.0.0"
-    uvicorn_port: int = 8000
 
+class ApiConfiguration(DatabaseConfiguration, RemoteConfiguraton):
     allowed_cors_origins: str = "http://localhost:5173"
 
 
-class DevelConfiguration(DefaultConfiguration):
-    database_uri: str = f"sqlite:////tmp/test-applifting-db.sqlite"
-    debug_mode: bool = True
-
-
-class TestConfiguration(DevelConfiguration):
+class ConnectorConfiguration(DatabaseConfiguration, RemoteConfiguraton):
     pass
 
 
-@lru_cache
-def get_configuration():
-    match(os.getenv("APP_MODE")):
-        case ["dev", "development"]:
-            return DevelConfiguration()
-        case ["prod", "production"]:
-            return DefaultConfiguration()
-        case _:
-            return TestConfiguration()
+class WatcherConfiguration(DatabaseConfiguration, RemoteConfiguraton):
+    sleep_secs: int = 10
+
+
+watcher = WatcherConfiguration()
+connector = ConnectorConfiguration()
+api = ApiConfiguration()
 

@@ -4,16 +4,16 @@ from starlette.middleware.cors import CORSMiddleware
 
 from aggregator_api.api import router
 from aggregator_api.error_handlers import register_exception_handlers
-from aggregator_common.configuration import get_configuration
+from aggregator_common import configuration
 
 app = FastAPI()
 app.include_router(router)
 
-for origin in get_configuration().allowed_cors_origins.split(","):
+for origin in configuration.api.allowed_cors_origins.split(","):
     logger.info(f"Allow CORS from origin {origin!r}.")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=get_configuration().allowed_cors_origins.split(","),
+    allow_origins=configuration.api.allowed_cors_origins.split(","),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

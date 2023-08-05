@@ -5,22 +5,6 @@ import pytest
 from aggregator_common.models import Offer
 
 
-@pytest.fixture(scope='function', params=[5])
-def offers(request, db_session, product):
-    offers = []
-    for index in range(request.param):
-        offers.append(
-            Offer(
-                price=index,
-                items_in_stock=index,
-                product_id=product.id,
-            )
-        )
-    db_session.add_all(offers)
-    db_session.commit()
-    return offers
-
-
 def test_get_offers(test_client, base_route, product, offers):
     response = test_client.get(posixpath.join(base_route, 'products', product.id))
     response.raise_for_status()

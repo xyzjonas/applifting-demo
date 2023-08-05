@@ -15,12 +15,4 @@ def test_client() -> TestClient:
     yield TestClient(app)
 
 
-@pytest.fixture(scope='function')
-def product(db_session, random_str):
-    product = Product(
-        name=f"Product ### {random_str()}",
-        description=random_str(size=64)
-    )
-    db_session.add(product)
-    db_session.commit()
-    return product
+

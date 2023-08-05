@@ -7,7 +7,7 @@ from loguru import logger
 
 from aggregator_common.models import engine
 from aggregator_common.models import Token as TokenDb
-from aggregator_common.configuration import get_configuration
+from aggregator_common import configuration
 from aggregator_common.exceptions import TokenError
 from aggregator_common.schemas import Token
 
@@ -18,13 +18,13 @@ class TokenManager:
     _token: Token | None
     token_key: int = 1
 
-    request_token_url = posixpath.join(get_configuration().cloud_uri, "api/v1/auth")
+    request_token_url = posixpath.join(configuration.connector.cloud_uri, "api/v1/auth")
 
     def __init__(self) -> None:
         self._token = None
 
-    async def _refresh_token(self) -> Token:
-        if not (access_token := get_configuration().access_token):
+    async def _refresh_token(self, db_session: Session = None) -> Token:
+        if not (access_token := configuration.connector.access_token):
             msg = "Missing auth token required for access token requests."
             logger.error(msg)
             logger.info("Use 'ACCESS_TOKEN' env variable to set it up.")
@@ -51,7 +51,7 @@ class TokenManager:
                 raise TokenError(f"Token request failed: {response.status}, {response.text}")
 
     def _query_token(self) -> Token | None:
-        logger.debug("Token not found in memory, querying the database.")
+        logger.info("Token not found in memory, querying the database.")
         with Session(engine) as session:
             token = session.query(TokenDb).filter_by(key=self.token_key).first()
 
@@ -79,7 +79,9 @@ class TokenManager:
                 return True
 
         delta = (datetime.utcnow() - self._token.updated_at)
-        return delta > timedelta(seconds=get_configuration().token_validity_secs)
+        if expired := delta > timedelta(seconds=configuration.connector.token_validity_secs):
+            logger.info(f"Token from {self._token.updated_at!r} is now expired...")
+        return expired
 
     async def get_token(self, force_refresh=False) -> Token:
         if force_refresh:
@@ -87,6 +89,7 @@ class TokenManager:
             self._token = await self._refresh_token()
 
         if not self.token_expired:
+            logger.debug(f"Token from {self._token.updated_at!r} is still valid...")
             return self._token
 
         new_token = self._update_token(await self._refresh_token())

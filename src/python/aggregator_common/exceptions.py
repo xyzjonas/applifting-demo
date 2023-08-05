@@ -37,6 +37,16 @@ class Conflict(NotFound):
         )
 
 
+class RemoteConnectionError(AggregatorError):
+
+    url: str
+
+    def __init__(self, msg, url: str, *args: object) -> None:
+        self.url = url
+        super().__init__(msg, *args)
+        self.msg = f"Failed at url {self.url!r}, {self.msg}"
+
+
 class TokenError(AggregatorError):
     pass
 

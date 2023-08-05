@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from aggregator_api.api.v1.common.controllers import ProductsController, OffersController
 from aggregator_common.models import engine
-from aggregator_connector.client import AggregatorClient
+from aggregator_connector.client import RemoteClient
 
 
 async def db_session() -> Session:
@@ -36,10 +36,10 @@ async def offers(db: DbSessionDependency) -> OffersController:
 OffersDependency = Annotated[OffersController, Depends(offers)]
 
 
-async def client(db: DbSessionDependency) -> AggregatorClient:
+async def client(db: DbSessionDependency) -> RemoteClient:
     """Get the export tool."""
-    return AggregatorClient()
+    return RemoteClient()
 
 
-AggregatorClientDependency = Annotated[AggregatorClient, Depends(client)]
+AggregatorClientDependency = Annotated[RemoteClient, Depends(client)]
 

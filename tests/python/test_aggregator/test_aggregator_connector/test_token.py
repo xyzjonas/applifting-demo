@@ -7,7 +7,7 @@ from mock.mock import MagicMock
 from aggregator_common.models import Token as TokenDb
 from aggregator_connector.token import TokenManager
 from aggregator_common.schemas import Token
-from aggregator_common.configuration import get_configuration
+from aggregator_common import configuration
 
 
 @pytest.fixture(scope='function')
@@ -25,7 +25,7 @@ def valid_token(db_session, random_str):
 def invalid_token(db_session, request, random_str):
     if request.param == "none":
         return
-    expired_datetime = datetime.utcnow() - timedelta(seconds=get_configuration().token_validity_secs + 1)  # noqa: E505
+    expired_datetime = datetime.utcnow() - timedelta(seconds=configuration.connector.token_validity_secs + 1)  # noqa: E505
     tok = TokenDb(key=1, value=random_str(), updated_at=expired_datetime)
     db_session.add(tok)
     db_session.commit()

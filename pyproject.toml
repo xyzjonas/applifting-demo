@@ -8,11 +8,14 @@ readme = "README.md"
 packages = [
     { include = "aggregator_api", from = "src/python" },
     { include = "aggregator_connector", from = "src/python" },
-    { include = "aggregator_common", from = "src/python" }
+    { include = "aggregator_common", from = "src/python" },
+    { include = "aggregator_mock", from = "src/python" }
 ]
 
 [tool.poetry.scripts]
 applifting-demo = "aggregator_api.main:serve"
+applifting-watcher = "aggregator_watcher.main:start_watch"
+remote-mock = "aggregator_mock.app:serve"
 
 [tool.poetry.dependencies]
 python = "^3.10"

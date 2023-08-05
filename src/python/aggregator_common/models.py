@@ -2,13 +2,12 @@ import uuid
 from datetime import datetime
 from typing import List
 
-from sqlalchemy import String, Integer, create_engine, Date, DateTime, func, Table, Column, \
-    ForeignKey
-from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, Session, relationship
+from sqlalchemy import String, Integer, create_engine, DateTime, ForeignKey
+from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, relationship
 
-from aggregator_common.configuration import get_configuration
+from aggregator_common import configuration
 
-engine = create_engine(get_configuration().database_uri, echo=get_configuration().debug_mode)
+engine = create_engine(configuration.api.database_uri, echo=configuration.api.debug_mode)
 
 
 def create_all():
@@ -57,7 +56,7 @@ class Token(Base):
     We're considering a distributed deployment method for this application, where
     we only use a single access token. To efficiently manage and reuse
     this access token within its validity period, we're planning to keep
-    it safely in a shared database."
+    it safely in a shared database.
     """
     __tablename__ = "token"
 
