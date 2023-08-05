@@ -8,8 +8,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from aggregator_api.api.v1.common import schemas
-from aggregator_api import models
-from aggregator_api.exceptions import NotFound, AggregatorError
+from aggregator_common.exceptions import NotFound, AggregatorError
+from aggregator_common import models
 
 C = TypeVar('C', bound=schemas.Base)
 M = TypeVar('M', bound=models.Base)
@@ -88,5 +88,5 @@ class ProductsController(
         schemas.ProductUpdate
     ]
 ):
-    pass
+    """Simple controller for products CRUD"""
 

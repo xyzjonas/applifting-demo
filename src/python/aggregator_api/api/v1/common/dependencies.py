@@ -1,16 +1,15 @@
 from typing import Annotated
 
 from fastapi import Depends
-from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from aggregator_api.api.v1.common.controllers import ProductsController
-from aggregator_api.configuration import get_configuration
+from aggregator_common.models import engine
+from aggregator_connector.client import AggregatorClient
 
 
 async def db_session() -> Session:
     """Get the export tool."""
-    engine = create_engine(get_configuration().database_uri, echo=get_configuration().debug_mode)
     db = Session(engine)
     try:
         yield db
@@ -27,4 +26,12 @@ async def products(db: DbSessionDependency) -> ProductsController:
 
 
 ProductsDependency = Annotated[ProductsController, Depends(products)]
+
+
+async def client(db: DbSessionDependency) -> AggregatorClient:
+    """Get the export tool."""
+    return AggregatorClient()
+
+
+AggregatorClientDependency = Annotated[AggregatorClient, Depends(client)]
 

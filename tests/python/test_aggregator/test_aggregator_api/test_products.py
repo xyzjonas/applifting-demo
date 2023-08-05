@@ -3,9 +3,10 @@ import uuid
 
 import pytest
 
-from aggregator_api.api.v1.common.schemas import ProductCreate, ProductRead, ProductUpdate
-from aggregator_api.models import Product
-from test_aggregator_api.utils import assert_response
+from aggregator_api.api.v1.common.schemas import ProductCreate, ProductUpdate
+from aggregator_common.schemas import Product as ProductRead
+from test_aggregator.utils import assert_response
+from aggregator_common.models import Product
 
 
 @pytest.fixture(scope='function', params=[0, 5, 100])
@@ -52,6 +53,7 @@ def test_get_product(test_client, base_route, product):
     response.raise_for_status()
 
 
+@pytest.mark.usefixtures('db_session')
 def test_add_product(test_client, base_route, random_str):
     create_data = ProductCreate(name=random_str(), description=random_str())
     response = assert_response(
@@ -81,6 +83,7 @@ def test_edit_product(test_client, base_route, product, random_str):
     assert product.description == update_data.description
 
 
+@pytest.mark.usefixtures('db_session')
 def test_edit_not_found(test_client, base_route, random_str):
     update_data = ProductUpdate(name=random_str(), description=random_str())
 

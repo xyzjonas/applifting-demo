@@ -13,21 +13,9 @@ class ProductBase(BaseModel):
     description: str
 
 
-class ProductRead(ProductBase):
-    id: UUID
-
-    class Config:
-        orm_mode = True
-
-
 class ProductCreate(ProductBase):
     pass
 
 
 class ProductUpdate(ProductBase):
     pass
-
-
-class GetPutPostOffer(Base):
-    price: int
-    items_in_stock: int

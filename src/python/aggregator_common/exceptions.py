@@ -37,4 +37,8 @@ class Conflict(NotFound):
         )
 
 
+class TokenError(AggregatorError):
+    pass
+
+
 

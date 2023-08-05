@@ -4,7 +4,7 @@ from starlette import status
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from aggregator_api.exceptions import NotFound, Conflict, AggregatorError
+from aggregator_common.exceptions import NotFound, Conflict, AggregatorError
 
 
 def generic_500_handler(request: Request, exc: AggregatorError):
