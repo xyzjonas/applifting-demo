@@ -38,6 +38,7 @@ class Watcher:
 
     @staticmethod
     def _get_update_offer_statement(product_id: UUID, new_offer: Offer):
+        """Update existing offers."""
         return (
             update(OfferDb)
             .where(OfferDb.id.in_([str(new_offer.id)]))
@@ -51,6 +52,7 @@ class Watcher:
 
     @staticmethod
     def _get_insert_offer_statement(product_id: UUID, offer: Offer):
+        """Insert new offers."""
         return (
             insert(OfferDb)
             .values(
@@ -63,12 +65,14 @@ class Watcher:
 
     @staticmethod
     def _get_delete_offers_statement(except_offers: list[Offer]):
+        """Delete all expired offers."""
         return (
             delete(OfferDb)
             .where(OfferDb.id.notin_([str(ofr.id) for ofr in except_offers]))
         )
 
     async def refresh(self):
+        """Update all offers with actual remote data."""
         with Session(engine) as session:
             all_products = session.query(ProductDb).all()
             logger.info(f"Updating all {len(all_products)} products.")
@@ -81,12 +85,12 @@ class Watcher:
 
             sql_statements = []
             do_not_delete = []
-            old_offers_ids = list(session.execute(select(OfferDb, column('id'))))
+            old_offers_ids = [o_id for _, o_id in session.execute(select(OfferDb, column('id')))]
             logger.info(old_offers_ids)
             for prod_id, new_offers in await asyncio.gather(*tasks):
                 for new_offer in new_offers:
                     do_not_delete.append(new_offer)
-                    if new_offer.id not in old_offers_ids:
+                    if str(new_offer.id) not in old_offers_ids:
                         sql_statements.append(self._get_insert_offer_statement(prod_id, new_offer))
                     else:
                         sql_statements.append(self._get_update_offer_statement(prod_id, new_offer))
@@ -99,6 +103,7 @@ class Watcher:
             session.commit()
 
     async def loop(self):
+        """Main watcher process loop."""
         logger.info("Starting loop.")
         while True:
             try:

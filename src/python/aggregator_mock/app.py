@@ -21,6 +21,9 @@ class TokenResposne(BaseModel):
     access_token: str
 
 
+offer = Offer(id=uuid.uuid4(), price=10, items_in_stock=1)
+
+
 @app.post("/api/v1/auth")
 def auth(response: Response) -> TokenResposne:
     response.status_code = 201
@@ -37,13 +40,15 @@ def register_product(product: Product, response: Response) -> RegisterProductRes
 
 @app.get("/api/v1/products/{product_id}/offers")
 def get_offers() -> list[Offer]:
-    offers = []
-    for index in range(random.randint(0, 10)):
+    offer.price = random.randint(1, 1000)
+    offer.items_in_stock = random.randint(1, 30)
+    offers = [offer]
+    for index in range(random.randint(0, 20)):
         offers.append(
             Offer(
                 id=uuid.uuid4(),
                 price=random.randint(10, 1000),
-                items_in_stock=random.randint(1, 10)
+                items_in_stock=random.randint(1, 30)
             )
         )
     return offers
