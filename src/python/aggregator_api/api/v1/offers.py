@@ -10,12 +10,12 @@ router = APIRouter(tags=['Offers'])
 
 
 @router.get('')
-async def get_offers(offers: OffersDependency, product_id: UUID = None) -> Page[Offer]:
+async def get_offers(offers: OffersDependency) -> Page[Offer]:
     return await offers.get_all(use_paginate=True)
 
 
 @router.get('/{offer_id}')
-async def get_product(offers: ProductsDependency, offer_id: UUID) -> Product:
+async def get_offer(offers: ProductsDependency, offer_id: UUID) -> Product:
     return await offers.get_by_id(offer_id)
 
 

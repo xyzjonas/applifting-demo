@@ -55,7 +55,7 @@ async def update_product(
 
 
 @router.delete('/{product_id}')
-async def create_product(products: ProductsDependency, product_id: UUID):
+async def delete_product(products: ProductsDependency, product_id: UUID):
     return await products.delete(product_id)
 
 

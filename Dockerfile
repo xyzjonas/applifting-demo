@@ -21,6 +21,6 @@ WORKDIR app
 COPY --from=build-stage dist/*.whl wheels/
 RUN pip install wheels/*
 
-EXPOSE 8000
+EXPOSE 8080
 
 ENTRYPOINT ["applifting-demo"]

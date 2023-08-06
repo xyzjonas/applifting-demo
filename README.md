@@ -29,12 +29,19 @@ export DATABASE_URI=<your-database-connection-string-here>
 export CLOUD_URI=<remote-service-base-url-here>
 ```
 
-#### 2) Compose
-
+#### 2) Docker & Compose
+Run individual images/services
+```shell
+# 1) API
+docker run -it --rm --entrypoint applifting-demo scotch3840/misc:applifting-demo
+# 2) Watcher
+docker run -it --rm --entrypoint applifting-watcher scotch3840/misc:applifting-demo
+```
+...or use attached compose file.
+```shell
+docker compose up -d
+```
 ```shell
 # ACCESS_TOKEN is the only required variable
 export ACCESS_TOKEN=<your-token-here>
-```
-```shell
-docker compose up -d
 ```
