@@ -1,9 +1,11 @@
 from typing import Annotated
 
 from fastapi import Depends
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
 from aggregator_api.api.v1.common.controllers import ProductsController, OffersController
+from aggregator_api.auth import User, decode_token
 from aggregator_common.models import engine
 from aggregator_connector.client import RemoteClient
 
@@ -43,3 +45,14 @@ async def client() -> RemoteClient:
 
 RemoteClientDependency = Annotated[RemoteClient, Depends(client)]
 
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+TokenDependency = Annotated[str, Depends(oauth2_scheme)]
+
+
+async def logged_in(token: TokenDependency) -> User:
+    """Get the export tool."""
+    return decode_token(token)
+
+
+LoggedInDependency = Annotated[User, Depends(logged_in)]

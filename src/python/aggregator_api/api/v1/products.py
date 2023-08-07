@@ -6,7 +6,7 @@ from fastapi_pagination import Page, add_pagination
 from starlette.responses import Response
 
 from aggregator_api.api.v1.common.dependencies import ProductsDependency, OffersDependency, \
-    RemoteClientDependency
+    RemoteClientDependency, LoggedInDependency
 from aggregator_api.api.v1.common.schemas import ProductCreate, ProductUpdate
 from aggregator_common.schemas import Product, Offer
 
@@ -14,17 +14,28 @@ router = APIRouter(tags=['Products'])
 
 
 @router.get('')
-async def get_products(products: ProductsDependency) -> Page[Product]:
+async def get_products(
+        products: ProductsDependency,
+        user: LoggedInDependency,
+) -> Page[Product]:
     return await products.get_all(use_paginate=True)
 
 
 @router.get('/{product_id}')
-async def get_product(products: ProductsDependency, product_id: UUID) -> Product:
+async def get_product(
+        products: ProductsDependency,
+        user: LoggedInDependency,
+        product_id: UUID
+) -> Product:
     return await products.get_by_id(product_id)
 
 
 @router.get('/{product_id}/offers')
-async def get_product_offers(offers: OffersDependency, product_id: UUID) -> Page[Offer]:
+async def get_product_offers(
+        offers: OffersDependency,
+        user: LoggedInDependency,
+        product_id: UUID
+) -> Page[Offer]:
     return await offers.get_by_product(product_id=product_id, use_paginate=True)
 
 
@@ -33,6 +44,7 @@ async def create_product(
         response: Response,
         products: ProductsDependency,
         client: RemoteClientDependency,
+        user: LoggedInDependency,
         product_data: ProductCreate,
 ) -> Product:
     product_id = uuid.uuid4()
@@ -48,6 +60,7 @@ async def create_product(
 @router.put('/{product_id}')
 async def update_product(
         products: ProductsDependency,
+        user: LoggedInDependency,
         product_data: ProductUpdate,
         product_id: UUID,
 ) -> Product:
@@ -55,7 +68,11 @@ async def update_product(
 
 
 @router.delete('/{product_id}')
-async def delete_product(products: ProductsDependency, product_id: UUID):
+async def delete_product(
+        products: ProductsDependency,
+        user: LoggedInDependency,
+        product_id: UUID,
+):
     return await products.delete(product_id)
 
 

@@ -7,7 +7,7 @@ from loguru import logger
 from pydantic import ValidationError, BaseModel
 
 from aggregator_common import configuration
-from aggregator_common.exceptions import AggregatorError, RemoteConnectionError
+from aggregator_common.exceptions import AggregatorError, RemoteConnectionError, TokenError
 from aggregator_common.schemas import Offer, Product
 from aggregator_connector.token import TokenManager
 
@@ -29,6 +29,10 @@ class RemoteClient:
         retries = 1
         max_retries = 3
 
+        def _raise(exc: Exception, msg):
+            logger.error(msg)
+            raise RemoteConnectionError(msg, exc) from exc
+
         async def inner(*args, **kwargs):
             try:
                 return await coro(*args, **kwargs)
@@ -39,16 +43,19 @@ class RemoteClient:
                         logger.warning(f"Got {exc_info.status}, retrying {retries}/{max_retries}")
                         retries += 1
                         return await inner(*args, **kwargs)
-                raise RemoteConnectionError(
-                    f"Aggregator connector request failed with: {exc_info.status}"
-                ) from exc_info
+                _raise(exc_info, f"Aggregator connector request failed with: {exc_info.status}")
+
+            except TokenError as exc_info:
+                _raise(exc_info, f"Auth error, {exc_info.msg}")
+
             except ValidationError as exc_info:
-                raise RemoteConnectionError(
-                    f"Unexpected response from remote service", exc_info
-                ) from exc_info
+                _raise(exc_info, f"Unexpected response from remote service, {exc_info}")
+
+            except AggregatorError as exc_info:
+                _raise(exc_info, f"Unexpected 'aggregtor' error, {exc_info.msg}")
+
             except Exception as exc_info:
-                logger.exception("Unexpected error while executing API request.")
-                raise RemoteConnectionError(str(exc_info)) from exc_info
+                _raise(exc_info, f"Unexpected error while executing API request., {exc_info}")
 
         return inner
 

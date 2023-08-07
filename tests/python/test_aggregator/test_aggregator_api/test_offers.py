@@ -1,9 +1,5 @@
 import posixpath
 
-import pytest
-
-from aggregator_common.models import Offer
-
 
 def test_get_offers(test_client, base_route, product, offers):
     response = test_client.get(posixpath.join(base_route, 'products', product.id))

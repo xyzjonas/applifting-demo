@@ -1,5 +1,5 @@
 import posixpath
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 
 import aiohttp
 from loguru import logger
@@ -23,9 +23,9 @@ class TokenManager:
     def __init__(self) -> None:
         self._token = None
 
-    async def _refresh_token(self, db_session: Session = None) -> Token:
+    async def _refresh_token(self) -> Token:
         if not (access_token := configuration.connector.access_token):
-            msg = "Missing auth token required for access token requests."
+            msg = "Missing ACCESS_TOKEN, required for access token requests."
             logger.error(msg)
             logger.info("Use 'ACCESS_TOKEN' env variable to set it up.")
             raise TokenError(msg)

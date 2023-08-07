@@ -48,4 +48,5 @@ class TokenError(AggregatorError):
     pass
 
 
-
+class AggregatorAuthError(AggregatorError):
+    pass
